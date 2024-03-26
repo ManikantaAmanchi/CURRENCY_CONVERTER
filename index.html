@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html ng-app="currencyConverterApp">
+
+<head>
+    <title>Currency Converter</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body>
+    <div ng-controller="CurrencyConverterController">
+        <h1>Currency Converter</h1>
+
+        <input type="number" ng-model="amount" placeholder="Enter amount">
+
+        <select ng-model="fromCurrency" ng-options="currency for currency in currencies">
+        </select>
+
+        <select ng-model="toCurrency" ng-options="currency for currency in currencies">
+        </select>
+
+        <button ng-click="convert()">Convert</button>
+
+        <p ng-if="result">{{amount}} {{fromCurrency}} is {{result}} {{toCurrency}}</p>
+    </div>
+
+    <script>
+        var app = angular.module('currencyConverterApp', []);
+
+        app.controller('CurrencyConverterController', function($scope, $http) {
+            $scope.currencies = ['USD', 'EUR', 'GBP', 'JPY']; // Add more currencies as needed
+
+            $scope.convert = function() {
+                var url = 'https://api.exchangerate-api.com/v4/latest/' + $scope.fromCurrency;
+
+                $http.get(url)
+                    .then(function(response) {
+                        var exchangeRate = response.data.rates[$scope.toCurrency];
+                        $scope.result = ($scope.amount * exchangeRate).toFixed(2);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            };
+        });
+    </script>
+</body>
+
+</html>
